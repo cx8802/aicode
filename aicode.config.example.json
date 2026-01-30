@@ -1,0 +1,21 @@
+{
+  "$schema": "./dist/config-schema.json",
+  "ai": {
+    "provider": "anthropic",
+    "anthropic": {
+      "apiKey": "sk-ant-api03-...",
+      "model": "claude-3-5-sonnet-20241022",
+      "baseUrl": "https://open.bigmodel.cn/api/anthropic"
+    },
+    "openai": {
+      "apiKey": "sk-proj-...",
+      "model": "gpt-4o",
+      "baseUrl": "https://api.openai.com/v1"
+    }
+  },
+  "ui": {
+    "theme": "dark",
+    "streamOutput": true
+  },
+  "workspace": "G:/code_work"
+}

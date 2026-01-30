@@ -31,9 +31,13 @@ export function getConfigPath(): string {
 /**
  * 加载配置
  * 优先级：环境变量 > 配置文件 > 默认值
+ *
+ * @param logger Logger 实例
+ * @param customPath 可选的自定义配置文件路径
  */
-export async function loadConfig(logger: Logger): Promise<Config> {
-  const configPath = getConfigPath()
+export async function loadConfig(logger: Logger, customPath?: string): Promise<Config> {
+  // 使用自定义路径或默认路径
+  const configPath = customPath || getConfigPath()
 
   try {
     // 尝试读取配置文件

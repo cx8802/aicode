@@ -4,8 +4,9 @@ import { z } from 'zod'
  * Anthropic AI 提供商配置 Schema
  */
 export const AnthropicConfigSchema = z.object({
-  apiKey: z.string().min(1, 'API key is required'),
+  apiKey: z.string().default(''),
   model: z.string().default('claude-3-5-sonnet-20241022'),
+  baseUrl: z.string().url().optional(),
   maxTokens: z.number().int().min(1).default(4096),
   temperature: z.number().min(0).max(1).default(0.7)
 })
@@ -14,8 +15,9 @@ export const AnthropicConfigSchema = z.object({
  * OpenAI 提供商配置 Schema
  */
 export const OpenAIConfigSchema = z.object({
-  apiKey: z.string().min(1, 'API key is required'),
+  apiKey: z.string().default(''),
   model: z.string().default('gpt-4-turbo'),
+  baseUrl: z.string().url().optional(),
   maxTokens: z.number().int().min(1).default(4096),
   temperature: z.number().min(0).max(1).default(0.7)
 })

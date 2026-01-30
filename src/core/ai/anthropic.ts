@@ -45,7 +45,8 @@ export class AnthropicProvider implements AIProvider {
 
     // 初始化 Anthropic 客户端（使用注入的客户端或创建新的）
     this.client = client ?? new Anthropic({
-      apiKey: config.apiKey
+      apiKey: config.apiKey,
+      baseURL: config.baseUrl
     })
 
     this.logger.debug(`Anthropic provider initialized with model: ${this.getModel()}`)
@@ -158,7 +159,7 @@ export class AnthropicProvider implements AIProvider {
    */
   private validateConfig(config: AnthropicConfig): void {
     if (!config.apiKey || config.apiKey.trim() === '') {
-      throw new AnthropicProviderError('API key is required')
+      this.logger.warn('API key is empty, set it via environment variable or config')
     }
   }
 

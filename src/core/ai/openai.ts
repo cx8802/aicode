@@ -135,7 +135,7 @@ export class OpenAIProvider implements AIProvider {
    */
   private validateConfig(config: OpenAIConfig): void {
     if (!config.apiKey || config.apiKey.trim() === '') {
-      throw new OpenAIProviderError('API key is required')
+      this.logger.warn('API key is empty, set it via environment variable or config')
     }
   }
 

@@ -8,7 +8,7 @@ import { createInterface } from 'readline/promises'
 import { stdin as input, stdout as output } from 'process'
 import { loadConfig } from '../../core/config/loader.js'
 import { Logger } from '../../utils/logger.js'
-import { createAIProvider } from '../../core/ai/index.js'
+import { createAIProviderFromConfig } from '../../core/ai/index.js'
 import { SessionManager } from '../../core/session/index.js'
 import { createREPL, type REPLContext } from '../repl.js'
 import { getAllTools } from '../../core/tools/index.js'
@@ -22,12 +22,16 @@ export function chatCommand(): Command {
   cmd.description('Start interactive chat REPL')
     .option('-m, --model <model>', 'AI model to use')
     .option('-p, --provider <provider>', 'AI provider (anthropic|openai)')
-    .action(async (options) => {
+    .action(async (options, command) => {
       const logger = new Logger()
 
       try {
-        // 加载配置
-        const config = await loadConfig(logger)
+        // 获取全局选项（包括 -c config 路径）
+        const globalOptions = command.parent?.opts() || {}
+        const configPath = globalOptions.config
+
+        // 加载配置（使用指定路径或默认路径）
+        const config = await loadConfig(logger, configPath)
 
         // 应用命令行选项覆盖
         if (options.provider) {
@@ -42,7 +46,7 @@ export function chatCommand(): Command {
         }
 
         // 创建 AI 提供商
-        const aiProvider = createAIProvider(config.ai, logger)
+        const aiProvider = createAIProviderFromConfig(config.ai, logger)
 
         // 创建会话管理器
         const session = new SessionManager({

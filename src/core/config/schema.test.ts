@@ -43,14 +43,18 @@ describe('AnthropicConfigSchema', () => {
     }
   })
 
-  it('应该拒绝缺少 API key 的配置', () => {
+  it('应该允许空的 API key', () => {
     const input = {
       model: 'claude-3-5-sonnet-20241022'
     }
 
     const result = AnthropicConfigSchema.safeParse(input)
 
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.apiKey).toBe('')
+      expect(result.data.model).toBe('claude-3-5-sonnet-20241022')
+    }
   })
 
   it('应该拒绝无效的 maxTokens', () => {
@@ -93,14 +97,18 @@ describe('OpenAIConfigSchema', () => {
     }
   })
 
-  it('应该拒绝缺少 API key 的配置', () => {
+  it('应该允许空的 API key', () => {
     const input = {
       model: 'gpt-4-turbo'
     }
 
     const result = OpenAIConfigSchema.safeParse(input)
 
-    expect(result.success).toBe(false)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.apiKey).toBe('')
+      expect(result.data.model).toBe('gpt-4-turbo')
+    }
   })
 })
 

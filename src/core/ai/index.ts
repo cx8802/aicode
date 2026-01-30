@@ -58,22 +58,12 @@ export function createAIProviderFromConfig(aiConfig: AIConfig, logger: Logger): 
         throw new Error('Anthropic configuration is missing')
       }
 
-      // 验证 API key 存在
-      if (!aiConfig.anthropic.apiKey || aiConfig.anthropic.apiKey.trim() === '') {
-        throw new Error('Anthropic API key is required')
-      }
-
       return new AnthropicProvider(aiConfig.anthropic, logger)
     }
 
     case 'openai': {
       if (!aiConfig.openai) {
         throw new Error('OpenAI configuration is missing')
-      }
-
-      // 验证 API key 存在
-      if (!aiConfig.openai.apiKey || aiConfig.openai.apiKey.trim() === '') {
-        throw new Error('OpenAI API key is required')
       }
 
       return new OpenAIProvider(aiConfig.openai, logger)
