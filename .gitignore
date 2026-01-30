@@ -36,3 +36,5 @@ Thumbs.db
 *.tsbuildinfo
 
 package-lock.json
+
+aicode.config.json
