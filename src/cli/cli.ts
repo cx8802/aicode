@@ -5,6 +5,7 @@ import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { Logger } from '../utils/logger.js'
 import { configCommand } from './commands/config.js'
+import { chatCommand } from './commands/chat.js'
 
 // 获取版本号
 function getVersion(): string {
@@ -48,32 +49,35 @@ export function createCli(): Command {
     .option('-d, --debug', 'Enable debug mode', false)
     .option('-v, --verbose', 'Enable verbose output', false)
     .action((options: CliOptions) => {
-      // 显示欢迎消息
+      // 默认行为：显示帮助信息
+      // 用户应该使用明确的子命令
       displayWelcome(logger)
 
-      // 如果启用了调试模式
       if (options.debug) {
         logger.debug('Debug mode enabled')
       }
 
-      // 如果启用了详细模式
       if (options.verbose) {
         logger.info('Verbose mode enabled')
       }
 
-      // 显示配置信息
       if (options.config) {
-        // 验证配置文件是否存在
         if (!existsSync(options.config)) {
           logger.error(`Config file not found: ${options.config}`)
           process.exit(1)
         }
         logger.info(`Using config: ${options.config}`)
       }
+
+      // 提示用户使用 chat 命令
+      logger.info('Run "aicode chat" to start interactive mode')
     })
 
   // 添加 config 子命令
   program.addCommand(configCommand())
+
+  // 添加 chat 子命令
+  program.addCommand(chatCommand())
 
   return program
 }

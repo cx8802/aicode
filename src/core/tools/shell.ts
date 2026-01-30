@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod'
-import execa from 'execa'
+import { execa } from 'execa'
 import type { Tool, ToolContext, ToolResult } from './base'
 
 /**
@@ -24,11 +24,20 @@ export const exec: Tool = {
     try {
       const { command, args = [], timeout, cwd, env } = exec.parameters.parse(params)
 
+      // 准备环境变量（只包含字符串值）
+      const execEnv: Record<string, string> = {}
+      if (env) {
+        Object.assign(execEnv, process.env)
+        Object.assign(execEnv, env)
+      } else {
+        Object.assign(execEnv, process.env)
+      }
+
       // 执行命令
       const result = await execa(command, args, {
         timeout,
         cwd: cwd || context.workspace,
-        env: env ? { ...process.env, ...env } : undefined,
+        env: execEnv,
         reject: false,
         stdout: 'pipe',
         stderr: 'pipe'
@@ -39,8 +48,8 @@ export const exec: Tool = {
         return {
           success: false,
           data: {
-            stdout: result.stdout,
-            stderr: result.stderr,
+            stdout: result.stdout.toString(),
+            stderr: result.stderr.toString(),
             exitCode: result.exitCode,
             failed: true
           }
@@ -50,15 +59,15 @@ export const exec: Tool = {
       return {
         success: true,
         data: {
-          stdout: result.stdout,
-          stderr: result.stderr,
+          stdout: result.stdout.toString(),
+          stderr: result.stderr.toString(),
           exitCode: result.exitCode
         }
       }
     } catch (error) {
-      const err = error as Error
+      const err = error as Error & { timedOut?: boolean }
       // 处理超时
-      if (err.message.includes('timed out')) {
+      if (err.timedOut || err.message.includes('timed out')) {
         return {
           success: false,
           error: `Command timed out`
@@ -68,7 +77,7 @@ export const exec: Tool = {
       if (err.message.includes('command not found') || err.message.includes('ENOENT')) {
         return {
           success: false,
-          error: `Command not found: ${params}`
+          error: `Command not found`
         }
       }
       return {
