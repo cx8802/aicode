@@ -2,6 +2,7 @@ import { Command } from 'commander'
 import { createRequire } from 'module'
 import { existsSync } from 'fs'
 import { Logger } from '../utils/logger.js'
+import { configCommand } from './commands/config.js'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../../package.json')
@@ -54,6 +55,9 @@ export function createCli(): Command {
         logger.info(`Using config: ${options.config}`)
       }
     })
+
+  // 添加 config 子命令
+  program.addCommand(configCommand())
 
   return program
 }
