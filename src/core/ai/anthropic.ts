@@ -37,11 +37,12 @@ export class AnthropicProvider implements AIProvider {
   private readonly logger: Logger
 
   constructor(config: AnthropicConfig, logger: Logger, client?: Anthropic) {
+    // 先设置 logger，因为 validateConfig 需要使用
+    this.logger = logger
+    this.config = config
+
     // 验证配置
     this.validateConfig(config)
-
-    this.config = config
-    this.logger = logger
 
     // 初始化 Anthropic 客户端（使用注入的客户端或创建新的）
     this.client = client ?? new Anthropic({

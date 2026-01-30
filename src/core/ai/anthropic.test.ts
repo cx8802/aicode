@@ -64,14 +64,15 @@ describe('AnthropicProvider', () => {
       expect(() => new AnthropicProvider(configWithoutModel, logger)).not.toThrow()
     })
 
-    it('应该验证 API key 存在', () => {
+    it('应该允许空的 API key（发出警告）', () => {
       const invalidConfig = {
         apiKey: '',
         maxTokens: 4096,
         temperature: 0.7
       } as AnthropicConfig
 
-      expect(() => new AnthropicProvider(invalidConfig, logger)).toThrow(AnthropicProviderError)
+      // 不应该抛出错误
+      expect(() => new AnthropicProvider(invalidConfig, logger)).not.toThrow()
     })
   })
 

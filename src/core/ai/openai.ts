@@ -37,15 +37,17 @@ export class OpenAIProvider implements AIProvider {
   private readonly logger: Logger
 
   constructor(config: OpenAIConfig, logger: Logger, client?: OpenAI) {
+    // 先设置 logger，因为 validateConfig 需要使用
+    this.logger = logger
+    this.config = config
+
     // 验证配置
     this.validateConfig(config)
 
-    this.config = config
-    this.logger = logger
-
     // 初始化 OpenAI 客户端（使用注入的客户端或创建新的）
     this.client = client ?? new OpenAI({
-      apiKey: config.apiKey
+      apiKey: config.apiKey,
+      baseURL: config.baseUrl
     })
 
     this.logger.debug(`OpenAI provider initialized with model: ${this.getModel()}`)

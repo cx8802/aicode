@@ -53,24 +53,26 @@ describe('AI Provider 工厂', () => {
       expect(() => createAIProvider('unknown' as any, invalidConfig, logger)).toThrow()
     })
 
-    it('应该拒绝无效的 Anthropic 配置', () => {
+    it('应该允许空的 Anthropic API key', () => {
       const invalidConfig = {
         apiKey: '',
         maxTokens: 4096,
         temperature: 0.7
       } as AnthropicConfig
 
-      expect(() => createAIProvider('anthropic', invalidConfig, logger)).toThrow()
+      // 不应该抛出错误
+      expect(() => createAIProvider('anthropic', invalidConfig, logger)).not.toThrow()
     })
 
-    it('应该拒绝无效的 OpenAI 配置', () => {
+    it('应该允许空的 OpenAI API key', () => {
       const invalidConfig = {
         apiKey: '',
         maxTokens: 4096,
         temperature: 0.7
       } as OpenAIConfig
 
-      expect(() => createAIProvider('openai', invalidConfig, logger)).toThrow()
+      // 不应该抛出错误
+      expect(() => createAIProvider('openai', invalidConfig, logger)).not.toThrow()
     })
   })
 
@@ -131,7 +133,7 @@ describe('AI Provider 工厂', () => {
       expect(provider).toBeInstanceOf(AnthropicProvider)
     })
 
-    it('应该在 API key 缺失时抛出错误', () => {
+    it('应该允许空的 API key', () => {
       const aiConfig: AIConfig = {
         provider: 'anthropic',
         anthropic: {
@@ -141,7 +143,8 @@ describe('AI Provider 工厂', () => {
         }
       }
 
-      expect(() => createAIProviderFromConfig(aiConfig, logger)).toThrow()
+      // 不应该抛出错误
+      expect(() => createAIProviderFromConfig(aiConfig, logger)).not.toThrow()
     })
   })
 })
