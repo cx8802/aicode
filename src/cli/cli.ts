@@ -1,12 +1,28 @@
 import { Command } from 'commander'
-import { createRequire } from 'module'
 import { existsSync } from 'fs'
+import { readFileSync } from 'fs'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
 import { Logger } from '../utils/logger.js'
 import { configCommand } from './commands/config.js'
 
-const require = createRequire(import.meta.url)
-const pkg = require('../../package.json')
-const packageVersion = pkg.version
+// 获取版本号
+function getVersion(): string {
+  try {
+    const __filename = fileURLToPath(import.meta.url)
+    const __dirname = dirname(__filename)
+
+    // 尝试从 package.json 读取版本
+    const packagePath = join(__dirname, '../../package.json')
+    const pkgContent = readFileSync(packagePath, 'utf-8')
+    const pkg = JSON.parse(pkgContent)
+    return pkg.version || '0.1.0'
+  } catch {
+    return '0.1.0'
+  }
+}
+
+const packageVersion = getVersion()
 
 /**
  * CLI 配置接口
