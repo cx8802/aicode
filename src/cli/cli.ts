@@ -4,6 +4,7 @@ import { readFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { Logger } from '../utils/logger.js'
+import { initializeConfig } from '../core/config/loader.js'
 import { configCommand } from './commands/config.js'
 import { chatCommand } from './commands/chat.js'
 
@@ -49,6 +50,11 @@ export function createCli(): Command {
     .option('-d, --debug', 'Enable debug mode', false)
     .option('-v, --verbose', 'Enable verbose output', false)
     .action((options: CliOptions) => {
+      // 初始化配置文件（如果不存在）
+      initializeConfig(logger).catch(() => {
+        // 静默失败
+      })
+
       // 默认行为：显示帮助信息
       // 用户应该使用明确的子命令
       displayWelcome(logger)

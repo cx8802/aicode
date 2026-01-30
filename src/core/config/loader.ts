@@ -25,12 +25,12 @@ export class ConfigLoaderError extends Error {
  */
 export function getConfigPath(): string {
   const homeDir = os.homedir()
-  return path.join(homeDir, '.aicode', 'config.json')
+  return path.join(homeDir, '.aicode', 'aicode.config.json')
 }
 
 /**
  * 加载配置
- * 优先级：环境变量 > 配置文件 > 默认值
+ * 从配置文件读取，文件不存在时使用默认值
  *
  * @param logger Logger 实例
  * @param customPath 可选的自定义配置文件路径
@@ -54,10 +54,7 @@ export async function loadConfig(logger: Logger, customPath?: string): Promise<C
       throw new ConfigLoaderError(errorMessage)
     }
 
-    let config = validationResult.data
-
-    // 应用环境变量覆盖
-    config = applyEnvironmentVariables(config)
+    const config = validationResult.data
 
     logger.debug(`Loaded configuration from ${configPath}`)
     return config
@@ -65,8 +62,7 @@ export async function loadConfig(logger: Logger, customPath?: string): Promise<C
     // 如果文件不存在，返回默认配置
     if (isFileNotFoundError(error)) {
       logger.debug('Config file not found, using defaults')
-      const defaultConfig = getDefaultConfig()
-      return applyEnvironmentVariables(defaultConfig)
+      return getDefaultConfig()
     }
 
     // JSON 解析错误
@@ -80,6 +76,28 @@ export async function loadConfig(logger: Logger, customPath?: string): Promise<C
     }
 
     throw new ConfigLoaderError('Failed to load configuration', error as Error)
+  }
+}
+
+/**
+ * 初始化配置文件
+ * 如果配置文件不存在，则创建默认配置文件
+ *
+ * @param logger Logger 实例
+ */
+export async function initializeConfig(logger: Logger): Promise<void> {
+  const configPath = getConfigPath()
+
+  try {
+    // 检查配置文件是否存在
+    await fs.access(configPath)
+    logger.debug('Configuration file already exists')
+  } catch {
+    // 文件不存在，创建默认配置
+    logger.info('Initializing configuration file...')
+    const defaultConfig = getDefaultConfig()
+    await saveConfig(defaultConfig, logger)
+    logger.info(`Configuration file created at: ${configPath}`)
   }
 }
 
@@ -102,37 +120,6 @@ export async function saveConfig(config: Config, logger: Logger): Promise<void> 
   } catch (error) {
     throw new ConfigLoaderError('Failed to save configuration', error as Error)
   }
-}
-
-/**
- * 应用环境变量覆盖
- */
-function applyEnvironmentVariables(config: Config): Config {
-  const result = { ...config }
-
-  // 覆盖 Anthropic API key
-  if (process.env.ANTHROPIC_API_KEY) {
-    result.ai = {
-      ...result.ai,
-      anthropic: {
-        ...result.ai.anthropic,
-        apiKey: process.env.ANTHROPIC_API_KEY
-      }
-    }
-  }
-
-  // 覆盖 OpenAI API key
-  if (process.env.OPENAI_API_KEY) {
-    result.ai = {
-      ...result.ai,
-      openai: {
-        ...result.ai.openai,
-        apiKey: process.env.OPENAI_API_KEY
-      }
-    }
-  }
-
-  return result
 }
 
 /**
