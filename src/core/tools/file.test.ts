@@ -37,8 +37,9 @@ describe('read_file 工具', () => {
   })
 
   it('应该处理文件不存在的情况', async () => {
+    // 使用 workspace 内的文件路径，但这个文件不存在
     const result = await fileTools.read_file.execute(
-      { path: 'non-existent.txt' },
+      { path: join(testDir, 'does-not-exist.txt') },
       { workspace: testDir, logger }
     )
 
